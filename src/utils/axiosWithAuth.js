@@ -1,4 +1,3 @@
-// utils/axiosWithAuth.js
 import axios from "axios";
 
 const axiosWithAuth = () => {
@@ -6,7 +5,7 @@ const axiosWithAuth = () => {
   const licenseKey = localStorage.getItem("license_key"); // optional
 
   const instance = axios.create({
-    // ✅ No baseURL, uses relative URLs like before
+    baseURL: process.env.REACT_APP_API_BASE_URL,  // ✅ Add this
     headers: {
       Authorization: token ? `Bearer ${token}` : "",
       ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
