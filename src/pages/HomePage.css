@@ -124,7 +124,7 @@ body, html {
     right: 50%;                 /* align center horizontally */
     transform: translateX(50%); /* perfectly center */
     width: 80%;                 /* wider for touch devices */
-    max-width: 300px;
+    max-width: 50px;
     font-size: 16px;            /* slightly smaller font */
     padding: 12px 20px;
   }
