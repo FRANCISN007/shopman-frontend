@@ -465,7 +465,7 @@ const UserManagement = () => {
 
               <div className="form-buttons">
                 <button type="submit">💾 Save</button>
-                <button type="button" onClick={cancelEdit}>❌ Cancel</button>
+                <button type="button" onClick={cancelEdit}>X Cancel</button>
               </div>
             </form>
           )}
