@@ -1,13 +1,9 @@
-// src/api/licenseApi.js
 import axios from "axios";
 
 // ----------------------
 // Determine backend URL
 // ----------------------
-// Use environment variable for Render or localhost for local dev
-const BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
-
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
 console.log("🔗 License API Base URL:", BASE_URL);
 
 // ----------------------
@@ -21,8 +17,7 @@ const apiClient = axios.create({
 // Request interceptor: only set JSON if body is not FormData
 apiClient.interceptors.request.use((config) => {
   if (config.data instanceof FormData) {
-    // Let browser set Content-Type for FormData
-    delete config.headers["Content-Type"];
+    delete config.headers["Content-Type"]; // FormData sets boundary automatically
   }
   return config;
 });
@@ -33,9 +28,7 @@ apiClient.interceptors.request.use((config) => {
 export const verifyLicense = async (licenseKey) => {
   if (!licenseKey) throw new Error("License key is required.");
   try {
-    const response = await apiClient.get(
-      `/license/verify/${encodeURIComponent(licenseKey)}`
-    );
+    const response = await apiClient.get(`/license/verify/${encodeURIComponent(licenseKey)}`);
     return response.data;
   } catch (error) {
     if (error.response) {

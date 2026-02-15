@@ -1,4 +1,3 @@
-// src/utils/axiosWithAuth.js
 import axios from "axios";
 
 /**
@@ -24,13 +23,12 @@ const axiosWithAuth = () => {
     if (!(config.data instanceof FormData)) {
       config.headers["Content-Type"] = "application/json";
     } else {
-      // Let browser set Content-Type for FormData (includes boundary)
       delete config.headers["Content-Type"];
     }
     return config;
   });
 
-  // Optional: response interceptor for unified error handling
+  // Response interceptor for unified error handling
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
