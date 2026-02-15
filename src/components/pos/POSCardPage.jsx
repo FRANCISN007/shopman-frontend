@@ -345,7 +345,7 @@ const handleLoadInvoice = async (invoiceNo) => {
   // SYNC PAYMENT
   // =========================
   useEffect(() => {
-    if (reprintMode) return; // 🔒 DO NOT touch payment in reprint
+    if (reprintMode) return;
 
     if (cartItems.length > 0 && !amountEdited) {
       setAmountPaid(netTotal);
@@ -354,8 +354,14 @@ const handleLoadInvoice = async (invoiceNo) => {
     if (cartItems.length === 0) {
       setAmountPaid(0);
       setAmountEdited(false);
+
+      // ✅ reset payment session
+      setPaymentMethod("cash");
+      setBankId("");
+      setShowBankDropdown(false);
     }
   }, [netTotal, cartItems.length, amountEdited, reprintMode]);
+
 
 
 
@@ -687,6 +693,47 @@ const handleLoadInvoice = async (invoiceNo) => {
                   }}
                 />
               </div>
+
+              <div className="payment-row compact">
+                <label>Method</label>
+                <select
+                  value={paymentMethod}
+                  disabled={reprintMode || cartItems.length === 0}
+                  onChange={(e) => {
+                    const method = e.target.value;
+                    setPaymentMethod(method);
+
+                    const showBank = method !== "cash";
+                    setShowBankDropdown(showBank);
+
+                    if (!showBank) setBankId("");
+                  }}
+                >
+                  <option value="">-- Select --</option>
+                  <option value="cash">Cash</option>
+                  <option value="transfer">Transfer</option>
+                  <option value="pos">POS</option>
+                </select>
+              </div>
+
+              {showBankDropdown && (
+                <div className="payment-row compact">
+                  <label>Bank</label>
+                  <select
+                    value={bankId}
+                    disabled={reprintMode}
+                    onChange={(e) => setBankId(e.target.value)}
+                  >
+                    <option value="">-- Bank --</option>
+                    {banks.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
 
               <div className="payment-row compact1">
                 <label>Balance</label>
