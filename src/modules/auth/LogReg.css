@@ -247,7 +247,7 @@
 .app-description {
   font-size: 16px;
   opacity: 0.95;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
   line-height: 1.6;
 }
 
@@ -262,9 +262,9 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  margin: 10px 0;
+  margin: 5px 0;
   font-size: 14px;
-  opacity: 0.95;
+  opacity: 0.8;
 }
 
 .app-features li::before {
