@@ -11,3 +11,56 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+
+/* ===== GLOBAL RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  overflow-x: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== MOBILE BASE ===== */
+.container,
+.auth-container,
+.dashboard-container {
+  width: 100%;
+  padding: 12px;
+}
+
+/* ===== TABLE SCROLL ON SMALL SCREENS ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* ===== BUTTONS ===== */
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+/* ===== RESPONSIVE BREAKPOINT ===== */
+@media (max-width: 768px) {
+  h1 { font-size: 22px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 18px; }
+
+  input, select {
+    width: 100%;
+    font-size: 16px;
+  }
+}
