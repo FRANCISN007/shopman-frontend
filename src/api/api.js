@@ -1,13 +1,16 @@
 import axios from "axios";
 
-// ✅ Use the API base URL from config.json (set globally in index.js)
-const API_BASE_URL = window.apiBaseUrl || `http://${window.location.hostname}:8000`;
+// ✅ Always use React environment variable first
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+
+console.log("🌐 Global API Base URL:", API_BASE_URL);
 
 const API = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 export default API;
