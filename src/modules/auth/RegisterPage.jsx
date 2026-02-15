@@ -68,9 +68,9 @@ const RegisterPage = () => {
           <li>POS Sales Point </li>
           <li>Purchases</li>
           <li>Payments & Receipts</li>
-          <li>Secured Database Integration</li>
           <li>Stock & Inventory Control</li>
           <li>Profit & Loss Account</li>
+          <li>Secured Database Integration</li>
         </ul>
 
         <p className="app-tagline">
