@@ -40,7 +40,7 @@ const Calculator = () => {
   ];
 
   return (
-    <div className="calculator" style={{ width: 297, height: 300, display: "flex", flexDirection: "column", padding: "2px", boxSizing: "border-box" }}>
+    <div className="calculator" style={{ width: 300, height: 300, display: "flex", flexDirection: "column", padding: "2px", boxSizing: "border-box" }}>
       <input
         className="calc-display"
         type="text"
