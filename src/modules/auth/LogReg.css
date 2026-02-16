@@ -12,7 +12,7 @@
 /* ====== Container ====== */
 .auth-container {
   width: 100%;
-  max-width: 300px; /* Compact card */
+  max-width: 350px; /* Compact card */
   margin: 8px auto;
   padding: 20px;
   border-radius: 10px;
