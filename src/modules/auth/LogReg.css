@@ -12,7 +12,7 @@
 /* ====== Container ====== */
 .auth-container {
   width: 100%;
-  max-width: 300px; /* Compact card */
+  max-width: 280px; /* Compact card */
   margin: 8px auto;
   padding: 20px;
   border-radius: 10px;
@@ -22,6 +22,12 @@
   flex-direction: column;
   align-items: center;
 }
+
+.auth-container p {
+  text-align: center;
+  margin-top: 12px;
+}
+
 
 /* ====== Logo ====== */
 .auth-logo-text {
