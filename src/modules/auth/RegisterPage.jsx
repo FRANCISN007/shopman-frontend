@@ -60,7 +60,7 @@ const RegisterPage = () => {
         </h1>
 
         <p className="app-description">
-          The App is a complete Inventory management & Sales solution designed to
+          This App is a complete Inventory management & Sales solution designed to
           simplify, automate, and centralize operations across:
         </p>
 
