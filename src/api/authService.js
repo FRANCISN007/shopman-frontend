@@ -1,47 +1,73 @@
+// src/api/authService.js
 import axios from "axios";
 
-/**
- * Creates an axios instance with authorization and optional license key headers.
- * Automatically uses REACT_APP_API_BASE_URL for backend URL.
- */
-const axiosWithAuth = () => {
-  // Get token and license key from localStorage
-  const token = localStorage.getItem("token");
-  const licenseKey = localStorage.getItem("license_key"); // optional
+// ----------------------
+// BASE URL
+// ----------------------
+// Use environment variable from React build
+// Must be set in Render frontend environment: REACT_APP_API_BASE_URL=https://shopman-backend-2.onrender.com
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-  // Create axios instance
-  const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8000",
-    headers: {
-      Authorization: token ? `Bearer ${token}` : "",
-      ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
-    },
+if (!BASE_URL) {
+  console.error("❌ REACT_APP_API_BASE_URL is not set! Login will fail.");
+}
+
+// ----------------------
+// Axios Client
+// ----------------------
+const authClient = axios.create({
+  baseURL: BASE_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+// ----------------------
+// Login User
+// ----------------------
+export const loginUser = async (username, password) => {
+  const formData = new URLSearchParams();
+  formData.append("username", username); // STRICT: do not change case
+  formData.append("password", password);
+
+  const response = await authClient.post("/users/token", formData, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
-  
 
-  // Interceptor: set Content-Type only for non-FormData
-  instance.interceptors.request.use((config) => {
-    if (!(config.data instanceof FormData)) {
-      config.headers["Content-Type"] = "application/json";
-    } else {
-      delete config.headers["Content-Type"];
-    }
-    return config;
-  });
+  const user = response.data;
 
-  // Response interceptor for unified error handling
-  instance.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (!error.response) {
-        console.error("❌ Network or backend not reachable", error);
-        return Promise.reject({ message: "Network or backend not reachable" });
-      }
-      return Promise.reject(error.response.data || { message: "API request failed" });
-    }
-  );
+  // Save token & user
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("token", user.access_token);
 
-  return instance;
+  return user;
 };
 
-export default axiosWithAuth;
+// ----------------------
+// Register User
+// ----------------------
+export const registerUser = async ({ username, password, roles, admin_password }) => {
+  const response = await authClient.post("/users/register/", {
+    username,
+    password,
+    roles, // array of roles
+    admin_password,
+  });
+
+  return response.data;
+};
+
+// ----------------------
+// Get Current User
+// ----------------------
+export const getCurrentUser = () => {
+  const userStr = localStorage.getItem("user");
+  return userStr ? JSON.parse(userStr) : null;
+};
+
+// ----------------------
+// Logout
+// ----------------------
+export const logoutUser = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+};
+
