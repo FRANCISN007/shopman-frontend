@@ -2,20 +2,32 @@
 import axios from "axios";
 import getBaseUrl from "./config";
 
-// ✅ Resolve base URL once (no async mutation)
-const BASE_URL = getBaseUrl();
+let BASE_URL = getBaseUrl();
 
-console.log("🌐 Auth API Base URL:", BASE_URL);
+const testBackend = async (url) => {
+  try {
+    const response = await fetch(`${url}/health`, { method: "GET", cache: "no-store" });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
 
-// ✅ Create axios client
+(async () => {
+  const reachable = await testBackend(BASE_URL);
+  if (!reachable && !BASE_URL.includes("localhost")) {
+    console.warn(`⚠️ Backend not reachable at ${BASE_URL}, switching to localhost.`);
+    BASE_URL = `${window.location.protocol}//localhost:8000`;
+  }
+  console.log("✅ Using API Base URL:", BASE_URL);
+})();
+
 const authClient = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// ===============================
-// LOGIN
-// ===============================
+// ✅ Login user
 export const loginUser = async (username, password) => {
   try {
     const formData = new URLSearchParams();
@@ -27,11 +39,8 @@ export const loginUser = async (username, password) => {
     });
 
     const user = response.data;
-
-    // ✅ Store session
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("token", user.access_token);
-
     return user;
   } catch (error) {
     console.error("❌ Login failed:", error);
@@ -39,15 +48,8 @@ export const loginUser = async (username, password) => {
   }
 };
 
-// ===============================
-// REGISTER
-// ===============================
-export const registerUser = async ({
-  username,
-  password,
-  roles,
-  admin_password,
-}) => {
+// ✅ Register user
+export const registerUser = async ({ username, password, roles, admin_password }) => {
   try {
     const response = await authClient.post("/users/register/", {
       username,
@@ -55,7 +57,6 @@ export const registerUser = async ({
       roles,
       admin_password,
     });
-
     return response.data;
   } catch (error) {
     console.error("❌ Registration failed:", error);
@@ -63,9 +64,6 @@ export const registerUser = async ({
   }
 };
 
-// ===============================
-// SESSION HELPERS
-// ===============================
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem("user");
   return userStr ? JSON.parse(userStr) : null;

@@ -100,7 +100,7 @@ body, html {
   top: 50%;                    /* vertical center */
   right: 20px;                 /* stick to right edge */
   transform: translateY(-50%); /* adjust for vertical centering */
-  padding: 14px 10px;
+  padding: 14px 32px;
   font-size: 18px;
   font-weight: bold;
   color: white;
