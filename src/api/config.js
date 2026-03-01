@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
-  // Production backend URL (set in Render environment variables)
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  // CRA environment variable
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
   }
 
   // Local development fallback
