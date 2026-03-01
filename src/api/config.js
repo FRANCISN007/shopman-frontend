@@ -1,7 +1,7 @@
 const getBaseUrl = () => {
-  // CRA environment variable
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+  // Use the correct environment variable
+  if (process.env.REACT_APP_API_BASE_URL) {
+    return process.env.REACT_APP_API_BASE_URL;
   }
 
   // Local development fallback
