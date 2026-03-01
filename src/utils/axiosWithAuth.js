@@ -17,7 +17,6 @@ const axiosWithAuth = () => {
       ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
     },
   });
-  
 
   // Interceptor: set Content-Type only for non-FormData
   instance.interceptors.request.use((config) => {

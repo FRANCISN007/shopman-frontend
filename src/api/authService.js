@@ -1,16 +1,30 @@
 // src/api/authService.js
 import axios from "axios";
+import getBaseUrl from "./config";
 
 // ----------------------
-// BASE URL
+// BASE URL & Health Check
 // ----------------------
-// Use environment variable from React build
-// Must be set in Render frontend environment: REACT_APP_API_BASE_URL=https://shopman-backend-2.onrender.com
-const BASE_URL = process.env.REACT_APP_API_BASE_URL;
+let BASE_URL = getBaseUrl();
 
-if (!BASE_URL) {
-  console.error("❌ REACT_APP_API_BASE_URL is not set! Login will fail.");
-}
+const testBackend = async (url) => {
+  try {
+    const response = await fetch(`${url}/health`, { method: "GET", cache: "no-store" });
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
+// Immediately check if backend is reachable; fallback to localhost if needed
+(async () => {
+  const reachable = await testBackend(BASE_URL);
+  if (!reachable && !BASE_URL.includes("localhost")) {
+    console.warn(`⚠️ Backend not reachable at ${BASE_URL}, switching to localhost.`);
+    BASE_URL = `${window.location.protocol}//localhost:8000`;
+  }
+  console.log("✅ Using API Base URL:", BASE_URL);
+})();
 
 // ----------------------
 // Axios Client
@@ -28,6 +42,7 @@ export const loginUser = async (username, password) => {
   formData.append("username", username); // STRICT: do not change case
   formData.append("password", password);
 
+  // Let Axios throw errors; frontend handles them
   const response = await authClient.post("/users/token", formData, {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
@@ -70,4 +85,3 @@ export const logoutUser = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
 };
-
