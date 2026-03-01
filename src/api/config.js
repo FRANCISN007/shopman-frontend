@@ -1,11 +1,11 @@
 const getBaseUrl = () => {
-  // Always prefer runtime URL
-  if (typeof window !== "undefined") {
-    return `${window.location.protocol}//${window.location.hostname}:8000`;
+  // Production backend URL (set in Render environment variables)
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
   }
 
-  // Fallback (SSR / tests only)
-  return "http://localhost:8000";
+  // Local development fallback
+  return "http://127.0.0.1:8000";
 };
 
 export default getBaseUrl;
