@@ -28,7 +28,7 @@ const PosSales = ({ onClose }) => {
   const [invoiceNo, setInvoiceNo] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
   const [refNo, setRefNo] = useState("");
-  const [showBankDropdown, setShowBankDropdown] = useState(false);
+  //const [showBankDropdown, setShowBankDropdown] = useState(false);
 
   const [businesses, setBusinesses] = useState([]);  // for super admin
   const [businessId, setBusinessId] = useState(null);  // selected business
@@ -64,10 +64,17 @@ const PosSales = ({ onClose }) => {
   
   const [amountPaid, setAmountPaid] = useState(0);
 
-  // ✅ Always keep amountPaid equal to netTotal (POSCard behavior)
+  
+
+
   useEffect(() => {
-    setAmountPaid(netTotal);
-  }, [netTotal]);
+  if (amountPaid === 0) {
+    setPaymentMethod("");
+    setBankId("");
+  
+  }
+}, [amountPaid]);
+
 
   const [productSearch, setProductSearch] = useState({});
   const [activeSearchRow, setActiveSearchRow] = useState(null);
@@ -319,17 +326,25 @@ const handleSubmit = async () => {
     return alert("Please select a business");
   }
 
-  if (!paymentMethod) {
-    return alert("Select payment method");
-  }
-
+  // ❌ Amount cannot be negative (always validate this first)
   if (amountPaid < 0) {
     return alert("Amount cannot be negative");
   }
 
-  if (paymentMethod !== "cash" && !bankId) {
-    return alert("Please select a bank");
+  // ✅ If there is payment, then method is required
+  if (amountPaid > 0) {
+
+    if (!paymentMethod) {
+      return alert("Select payment method");
+    }
+
+    // ✅ Bank required only for non-cash methods
+    if (paymentMethod !== "cash" && !bankId) {
+      return alert("Please select a bank");
+    }
+
   }
+
 
   const token = localStorage.getItem("token");
 
@@ -705,11 +720,14 @@ const handleSubmit = async () => {
                   <label>Method</label>
                   <select
                     value={paymentMethod}
+                    disabled={amountPaid === 0}
                     onChange={(e) => {
                       const method = e.target.value;
                       setPaymentMethod(method);
-                      setShowBankDropdown(method !== "cash");
-                      if (method === "cash") setBankId("");
+
+                      if (method === "cash") {
+                        setBankId("");
+                      }
                     }}
                   >
                     <option value="">-- Select --</option>
@@ -717,9 +735,12 @@ const handleSubmit = async () => {
                     <option value="transfer">Transfer</option>
                     <option value="pos">POS</option>
                   </select>
+
+
                 </div>
 
-                {showBankDropdown && (
+                {amountPaid > 0 && paymentMethod !== "cash" && (
+
                   <div className="payment-row compact">
                     <label>Bank</label>
                     <select value={bankId} onChange={(e) => setBankId(e.target.value)}>
