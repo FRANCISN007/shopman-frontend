@@ -7,7 +7,7 @@ import { numberToWords } from "../../utils/numberToWords";
 
 
 import { printReceipt } from "../../components/pos/printReceipt";
-import { SHOP_NAME } from "../../config/constants";
+//import { SHOP_NAME } from "../../config/constants";
 
 
 
@@ -384,14 +384,26 @@ const handleLoadInvoice = async (invoiceNo) => {
 
 
   const handlePrintReceipt = (invoiceNo) => {
+    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    const business = storedUser.business;
+
+    if (!business?.name) {
+      alert("Business information missing. Please login again.");
+      return;
+    }
+
     const receiptData = {
-      SHOP_NAME,
+      RECEIPT_NAME: business.name,
+      BUSINESS_ADDRESS: business.address || "",
+      BUSINESS_PHONE: business.phone || "",
+      BUSINESS_LOGO: business.logo || "",
+
       invoice: invoiceNo,
       invoiceDate: new Date().toISOString().split("T")[0],
-      customerName,
-      customerPhone,
-      refNo,
-      paymentMethod,
+      customerName: customerName || "-",
+      customerPhone: customerPhone || "-",
+      refNo: refNo || "-",
+      paymentMethod: paymentMethod || "-",
 
       grossTotal,
       totalDiscount,
@@ -408,9 +420,6 @@ const handleLoadInvoice = async (invoiceNo) => {
         discount: i.discount || 0,
         net_amount: i.qty * i.selling_price - (i.discount || 0),
       })),
-
-      formatCurrency: (amount) =>
-        `₦${Number(amount || 0).toLocaleString("en-NG")}`,
 
       amountInWords: numberToWords(netTotal),
     };
