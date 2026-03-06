@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axiosWithAuth from "../../utils/axiosWithAuth";
 import "./CreateExpenses.css";
+
+
+
 
 const ACCOUNT_TYPES = [
   "Transportation/Haulage",
@@ -31,6 +34,9 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const refInput = useRef(null);
+
 
   const [formData, setFormData] = useState({
     ref_no: "",
@@ -84,9 +90,6 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
     }));
   };
 
-  // ==============================
-  // Submit form
-  // ==============================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -94,6 +97,7 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
 
     if (!formData.ref_no.trim()) {
       setError("Reference number is required");
+      refInput.current?.focus();
       return;
     }
 
@@ -102,33 +106,27 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
       return;
     }
 
-    if (
-      ["transfer", "pos"].includes(formData.payment_method) &&
-      !formData.bank_id
-    ) {
+    if (["transfer", "pos"].includes(formData.payment_method) && !formData.bank_id) {
       setError("Bank is required for Transfer or POS payments");
       return;
     }
 
+    const payload = {
+      ...formData,
+      vendor_id: Number(formData.vendor_id),
+      bank_id: formData.bank_id ? Number(formData.bank_id) : null,
+      amount: Number(formData.amount),
+      expense_date: new Date(formData.expense_date).toISOString(),
+    };
+
     try {
       setLoading(true);
 
-      const payload = {
-        ...formData,
-        vendor_id: Number(formData.vendor_id),
-        bank_id: formData.bank_id ? Number(formData.bank_id) : null,
-        amount: Number(formData.amount),
-        expense_date: new Date(formData.expense_date).toISOString(),
-      };
-
       await axiosWithAuth().post("/accounts/expenses/", payload);
 
-      // ✅ show success message
       setSuccess("Expense created successfully!");
 
-      // reset form for next entry
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
         ref_no: "",
         vendor_id: "",
         account_type: "",
@@ -136,18 +134,42 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
         amount: "",
         payment_method: "",
         bank_id: "",
-      }));
+        expense_date: new Date().toISOString().slice(0, 16),
+      });
 
       if (onSuccess) onSuccess();
 
-      // auto-hide success message only
       setTimeout(() => setSuccess(""), 2000);
+
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to create expense");
+
+      let message = "Reference No already exists for this business";
+
+      if (err.response) {
+        const data = err.response.data;
+
+        if (typeof data.detail === "string") {
+          message = data.detail;
+
+        } else if (Array.isArray(data.detail)) {
+          message = data.detail.map((e) => e.msg).join(", ");
+
+        } else if (data.message) {
+          message = data.message;
+        }
+      }
+
+      setError(message);
+
+      if (message.toLowerCase().includes("reference number")) {
+        refInput.current?.focus();
+      }
+
     } finally {
       setLoading(false);
     }
   };
+
 
   // ==============================
   // Close form
@@ -178,11 +200,13 @@ const CreateExpenses = ({ onClose, onSuccess }) => {
               <input
                 type="text"
                 name="ref_no"
+                ref={refInput}
                 value={formData.ref_no}
                 onChange={handleChange}
                 placeholder="PCV-001"
                 required
               />
+
             </div>
 
             {/* Vendor */}
