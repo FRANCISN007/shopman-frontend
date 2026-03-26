@@ -936,4 +936,5 @@ const handleSubmit = async () => {
   );
 };
 
+
 export default PosSales;

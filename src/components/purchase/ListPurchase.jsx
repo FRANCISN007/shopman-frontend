@@ -45,7 +45,7 @@ const ListPurchase = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        const res = await axiosWithAuth().get("/auth/me");
+        const res = await axiosWithAuth().get("/users/me");
 
         const userBusiness = res.data?.business;
 
