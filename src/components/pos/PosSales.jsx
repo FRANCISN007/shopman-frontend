@@ -20,11 +20,13 @@ const API_BASE_URL =
 const PosSales = ({ onClose }) => {
 
   const createEmptyRow = () => ({
+    barcode: "",
     productId: "",
     quantity: 1,
     sellingPrice: 0,
     discount: 0
   });
+
 
    const [saleItems, setSaleItems] = useState(
     Array.from({ length: 6 }, createEmptyRow)
@@ -174,36 +176,70 @@ const PosSales = ({ onClose }) => {
 }, []);
 
   
-  const handleBarcodeScan = (rowIndex, barcodeValue) => {
-    if (!barcodeValue) return;
+  const handleBarcodeScan = async (rowIndex, barcodeValue) => {
+    if (!barcodeValue || barcodeValue.length < 4) return;
 
-    const product = products.find(
-      (p) => p.barcode && p.barcode.toString() === barcodeValue.toString()
-    );
+    const token = localStorage.getItem("token");
 
-    if (!product) {
-      alert("Product not found for scanned barcode");
-      return;
+    try {
+      const res = await axios.get(
+        `${API_BASE_URL}/stock/products/scan/${barcodeValue}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            business_id: businessId || undefined,
+          },
+        }
+      );
+
+      const product = res.data;
+
+      const newItems = [...saleItems];
+
+      newItems[rowIndex] = {
+        ...newItems[rowIndex],
+        barcode: product.barcode,
+        productId: product.id,
+        sellingPrice: product.selling_price || 0,
+        quantity: 1,
+      };
+
+
+      setSaleItems(newItems);
+
+      // ✅ AUTO MOVE TO NEXT ROW (REAL POS FLOW)
+      const nextRow = rowIndex + 1;
+
+      if (nextRow >= newItems.length) {
+        setSaleItems([...newItems, createEmptyRow()]);
+      }
+
+    } catch (err) {
+      console.error("Scan failed", err);
+
+      const newItems = [...saleItems];
+
+      // ❗ Reset ONLY product-related fields (NOT barcode)
+      newItems[rowIndex] = {
+        ...newItems[rowIndex],
+        productId: "",
+        sellingPrice: 0,
+      };
+
+      setSaleItems(newItems);
+
+      // ❌ Do NOT spam alert repeatedly
+      // Only show once
+      if (!newItems[rowIndex].barcodeErrorShown) {
+        alert("Product not found for scanned barcode");
+
+        newItems[rowIndex].barcodeErrorShown = true;
+        setSaleItems([...newItems]);
+      }
     }
 
-    const newItems = [...saleItems];
-
-    newItems[rowIndex] = {
-      ...newItems[rowIndex],
-      productId: product.id,
-      sellingPrice: product.selling_price || 0,
-      quantity: 1,
-    };
-
-    setSaleItems(newItems);
-
-    // 🔥 MOVE TO NEXT ROW (smooth scanning flow)
-    const nextRow = rowIndex + 1;
-
-    if (nextRow >= saleItems.length) {
-      setSaleItems([...newItems, createEmptyRow()]);
-    }
   };
+
 
 
 
@@ -591,11 +627,28 @@ const handleSubmit = async () => {
               <input
                 type="text"
                 placeholder="Scan barcode..."
-                value={
-                  products.find(p => p.id === Number(item.productId))?.barcode || ""
-                }
-                onChange={(e) => handleBarcodeScan(index, e.target.value)}
+                value={item.barcode || ""}   // ✅ HERE
+                onChange={(e) => {
+                  const value = e.target.value;
+
+                  const newItems = [...saleItems];
+                  newItems[index].barcode = value;
+
+                  // reset error flag when user types again
+                  newItems[index].barcodeErrorShown = false;
+
+                  setSaleItems(newItems);
+
+                  // ✅ CALL SCAN ONLY WHEN LENGTH IS VALID
+                  if (value.length >= 4) {
+                    handleBarcodeScan(index, value);
+                  }
+                }}
+
+                
               />
+
+
             </td>
 
 
