@@ -196,6 +196,28 @@ const PosSales = ({ onClose }) => {
 
       const newItems = [...saleItems];
 
+      // 🔍 Check if product already exists in another row
+      const existingIndex = newItems.findIndex(
+        (item, i) =>
+          i !== rowIndex &&
+          Number(item.productId) === Number(product.id)
+      );
+
+      if (existingIndex !== -1) {
+        // ✅ Merge: increase quantity instead of duplicate row
+        newItems[existingIndex] = {
+          ...newItems[existingIndex],
+          quantity: (newItems[existingIndex].quantity || 0) + 1,
+        };
+
+        // 🧹 Clear current row (since we merged it)
+        newItems[rowIndex] = createEmptyRow();
+
+        setSaleItems(newItems);
+        return;
+      }
+
+      // ✅ Normal behavior (new product)
       newItems[rowIndex] = {
         ...newItems[rowIndex],
         barcode: product.barcode,
@@ -204,10 +226,9 @@ const PosSales = ({ onClose }) => {
         quantity: 1,
       };
 
-
       setSaleItems(newItems);
 
-      // ✅ AUTO MOVE TO NEXT ROW (REAL POS FLOW)
+      // ➕ AUTO MOVE TO NEXT ROW
       const nextRow = rowIndex + 1;
 
       if (nextRow >= newItems.length) {
@@ -219,7 +240,7 @@ const PosSales = ({ onClose }) => {
 
       const newItems = [...saleItems];
 
-      // ❗ Reset ONLY product-related fields (NOT barcode)
+      // ❗ Reset only product fields (keep barcode)
       newItems[rowIndex] = {
         ...newItems[rowIndex],
         productId: "",
@@ -228,8 +249,7 @@ const PosSales = ({ onClose }) => {
 
       setSaleItems(newItems);
 
-      // ❌ Do NOT spam alert repeatedly
-      // Only show once
+      // 🚫 Prevent repeated alerts per row
       if (!newItems[rowIndex].barcodeErrorShown) {
         alert("Product not found for scanned barcode");
 
@@ -237,8 +257,8 @@ const PosSales = ({ onClose }) => {
         setSaleItems([...newItems]);
       }
     }
-
   };
+
 
 
 
