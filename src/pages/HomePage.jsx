@@ -73,8 +73,7 @@ const HomePage = () => {
         <Crystal />
 
         {/* TOP TEXT */}
-        <div className="hotel-name-banner">{WELCOME_ADDRESS}</div>
-
+        
         {/* 🪄 LOGO */}
         <div className="logo-badge">
           <span className="logo-icon">◆</span>
