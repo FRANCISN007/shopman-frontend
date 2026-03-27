@@ -662,29 +662,29 @@ const handleSubmit = async () => {
                   newItems[index].barcodeErrorShown = false;
 
                   setSaleItems(newItems);
-                }}
 
+                  // ✅ AUTO FETCH (for manual typing)
+                  if (value.length >= 6) {   // adjust based on your barcode length
+                    clearTimeout(newItems[index].barcodeTimer);
+
+                    newItems[index].barcodeTimer = setTimeout(() => {
+                      handleBarcodeScan(index, value.trim());
+                    }, 300); // debounce
+                  }
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
 
-                    // ⏱️ small delay to ensure scanner completes
-                    setTimeout(() => {
-                      const barcodeValue = e.target.value.trim();
+                    const barcodeValue = e.target.value.trim();
 
-                      console.log("FINAL BARCODE:", barcodeValue); // debug
+                    if (barcodeValue.length < 6) return;
 
-                      // ✅ optional: enforce full barcode length
-                      if (barcodeValue.length < 12) {
-                        console.warn("Incomplete barcode, ignoring");
-                        return;
-                      }
-
-                      handleBarcodeScan(index, barcodeValue);
-                    }, 100);
+                    handleBarcodeScan(index, barcodeValue);
                   }
                 }}
               />
+
 
 
 
