@@ -1,22 +1,50 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import backgroundImage from "../assets/images/SEASIDE.png";
 import "./HomePage.css";
-import { SHOP_NAME } from "../config/constants";
+import { WELCOME_ADDRESS } from "../config/constants";
 
 const HomePage = () => {
   const navigate = useNavigate();
 
   const handleProceed = () => {
-    // Always go to login screen – no skipping, no token check here
     console.log("Proceed clicked → redirecting to login");
     navigate("/login", { replace: true });
   };
 
   console.log("HomePage component rendered – no auto-login");
 
+  /* ================= CRYSTAL ================= */
+  const Crystal = () => {
+    return (
+      <div className="crystal-wrapper">
+        <div className="crystal"></div>
+        <div className="crystal-glow"></div>
+      </div>
+    );
+  };
+
+  /* ================= SHOOTING STARS ================= */
+  const ShootingStars = () => {
+    return (
+      <div className="stars-container">
+        {Array.from({ length: 15 }).map((_, i) => (
+          <span
+            key={i}
+            className="shooting-star"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              animationDuration: `${2 + Math.random() * 3}s`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
+      {/* Fonts */}
       <link
         href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap"
         rel="stylesheet"
@@ -29,18 +57,31 @@ const HomePage = () => {
       <div
         className="home-container"
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-          backgroundPosition: "center",
+          backgroundColor: "#344153",
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        <div className="hotel-name-banner">{SHOP_NAME}</div>
+        {/* 🌌 BACKGROUND ANIMATION */}
+        <ShootingStars />
 
+        {/* 💎 CENTER CRYSTAL */}
+        <Crystal />
+
+        {/* TOP TEXT */}
+        <div className="hotel-name-banner">{WELCOME_ADDRESS}</div>
+
+        {/* 🪄 LOGO */}
+        <div className="logo-badge">
+          <span className="logo-icon">◆</span>
+          <span>ShopMan</span>
+        </div>
+
+        {/* MAIN CONTENT */}
         <div className="home-card">
           <div className="hems-text">
             <span className="hems-letter">SH</span>
@@ -58,9 +99,10 @@ const HomePage = () => {
           </button>
         </div>
 
+        {/* FOOTER */}
         <footer className="home-footer">
           <div>Produced & Licensed by School of Accounting Package</div>
-          <div>© 2025</div>
+          <div>© 2026</div>
         </footer>
       </div>
     </>
