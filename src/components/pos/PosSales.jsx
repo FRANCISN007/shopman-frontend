@@ -653,26 +653,39 @@ const handleSubmit = async () => {
               <input
                 type="text"
                 placeholder="Scan barcode..."
-                value={item.barcode || ""}   // ✅ HERE
+                value={item.barcode || ""}
                 onChange={(e) => {
                   const value = e.target.value;
 
                   const newItems = [...saleItems];
                   newItems[index].barcode = value;
-
-                  // reset error flag when user types again
                   newItems[index].barcodeErrorShown = false;
 
                   setSaleItems(newItems);
-
-                  // ✅ CALL SCAN ONLY WHEN LENGTH IS VALID
-                  if (value.length >= 4) {
-                    handleBarcodeScan(index, value);
-                  }
                 }}
 
-                
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+
+                    // ⏱️ small delay to ensure scanner completes
+                    setTimeout(() => {
+                      const barcodeValue = e.target.value.trim();
+
+                      console.log("FINAL BARCODE:", barcodeValue); // debug
+
+                      // ✅ optional: enforce full barcode length
+                      if (barcodeValue.length < 12) {
+                        console.warn("Incomplete barcode, ignoring");
+                        return;
+                      }
+
+                      handleBarcodeScan(index, barcodeValue);
+                    }, 100);
+                  }
+                }}
               />
+
 
 
             </td>
