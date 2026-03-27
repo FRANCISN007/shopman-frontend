@@ -36,6 +36,9 @@ const CreatePurchase = ({ onClose, currentUser }) => {
   const [message, setMessage] = useState("");
   const [visible, setVisible] = useState(true);
 
+  const [activeSearchRow, setActiveSearchRow] = useState(null);
+
+
   // ✅ CACHE ALL PRODUCTS (KEY FIX)
   const [allProducts, setAllProducts] = useState([]);
 
@@ -45,6 +48,8 @@ const CreatePurchase = ({ onClose, currentUser }) => {
     if (isSuperAdmin) fetchBusinesses();
     setPurchaseDate(new Date().toISOString().split("T")[0]);
   }, []);
+
+
 
   // reload products when business changes
   useEffect(() => {
@@ -59,6 +64,15 @@ const CreatePurchase = ({ onClose, currentUser }) => {
       setVendors([]);
     }
   };
+
+
+  useEffect(() => {
+    const closeDropdown = () => setActiveSearchRow(null);
+    document.addEventListener("click", closeDropdown);
+    return () => document.removeEventListener("click", closeDropdown);
+  }, []);
+
+
 
   const fetchBusinesses = async () => {
     try {
@@ -83,19 +97,22 @@ const CreatePurchase = ({ onClose, currentUser }) => {
 
   /* ===================== FAST LOCAL SEARCH ===================== */
   const searchProducts = (index, query) => {
-    if (!query || query.length < 2) return;
+    const q = (query || "").toLowerCase();
 
-    const q = query.toLowerCase();
-
-    const filtered = allProducts.filter((p) =>
-      (p.name || "").toLowerCase().includes(q) ||
-      (p.barcode || "").includes(q)
-    );
+    const filtered = allProducts
+      .filter((p) =>
+        !q ||   // 🔥 show ALL when empty (like POS)
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.barcode || "").includes(q)
+      )
+      .slice(0, 10);
 
     const updated = [...rows];
     updated[index].products = filtered;
     setRows(updated);
   };
+
+
 
   /* ===================== Barcode Scan ===================== */
   const scanBarcode = async (index, barcode) => {
@@ -326,28 +343,39 @@ const CreatePurchase = ({ onClose, currentUser }) => {
               />
 
               {/* Product Search (FAST LOCAL) */}
-              <div className="product-search">
+              <div
+                className="product-search-wrapper"
+                onClick={(e) => e.stopPropagation()}  // 🔥 VERY IMPORTANT
+              >
+
                 <input
                   type="text"
-                  value={row.productQuery}
+                  value={
+                    activeSearchRow === index
+                      ? row.productQuery
+                      : row.productQuery
+                  }
                   placeholder="Search product..."
+                  onFocus={() => {
+                    setActiveSearchRow(index);
+                    searchProducts(index, row.productQuery);
+                  }}
                   onChange={(e) => {
                     const value = e.target.value;
                     handleRowChange(index, "productQuery", value);
                     searchProducts(index, value);
                   }}
-                  required
                 />
 
-                {row.products.length > 0 && (
-                  <div className="product-dropdown">
-                    {row.products.map((p) => (
+
+                {activeSearchRow === index && row.products.length > 0 && (
+
+                  <div className="product-search-dropdown">
+                    {row.products.slice(0, 50).map((p) => (
                       <div
                         key={p.id}
-                        className="product-option"
-                        onClick={() =>
-                          handleProductSelect(index, p)
-                        }
+                        className="product-search-item"
+                        onClick={() => handleProductSelect(index, p)}
                       >
                         {p.barcode ? `[${p.barcode}] ` : ""}
                         {p.name}
@@ -356,6 +384,7 @@ const CreatePurchase = ({ onClose, currentUser }) => {
                   </div>
                 )}
               </div>
+
 
               <input
                 type="number"
