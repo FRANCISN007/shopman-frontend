@@ -20,11 +20,13 @@ const ACCOUNT_TYPES = [
   "Security Expenses",
   "Office Expenses",
   "Fumigation Expenses",
-  "Electrical Expenses",
+  "Fumigation Expenses",
+  "Waste Disposal",
   "Entertainment",
   "General Expenses",
   "Cost of Sales",
 ];
+
 
 const CreateExpenses = ({ onClose, onSuccess }) => {
   const [vendors, setVendors] = useState([]);
