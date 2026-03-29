@@ -18,7 +18,10 @@
     "serve": "^14.2.6",
     "web-vitals": "^2.1.4",
     "xlsx": "^0.18.5"
+    
   },
+
+  
   "scripts": {
     "start": "serve -s build",
     "build": "react-scripts build",
@@ -43,4 +46,5 @@
       "last 1 safari version"
     ]
   }
+  
 }
