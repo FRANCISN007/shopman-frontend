@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
-import axiosWithAuth from "../../utils/axiosWithAuth";
+import axios from "axios";
+//import axiosWithAuth from "../../utils/axiosWithAuth";
 import "./ListSales.css";
+
+const BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  "http://localhost:8000";
 
 const ListSales = () => {
   const today = new Date().toISOString().split("T")[0];
@@ -48,14 +53,18 @@ const ListSales = () => {
     setError("");
 
     try {
-      const axiosInstance = axiosWithAuth();
-
-      const response = await axiosInstance.get("/sales/", {
+      const response = await axios.get(`${BASE_URL}/sales/`, {
         params: {
           start_date: startDate,
           end_date: endDate,
         },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
       });
+
+
+
 
       const data = response.data;
 
