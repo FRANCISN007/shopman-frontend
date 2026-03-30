@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "react-scripts build",
-    "start": "node server.js",
+    "start": "serve -s build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
