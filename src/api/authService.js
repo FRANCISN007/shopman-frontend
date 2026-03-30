@@ -1,51 +1,45 @@
 // src/api/authService.js
 import axios from "axios";
-import getBaseUrl from "./config";
 
-// ----------------------
-// BASE URL & Health Check
-// ----------------------
-let BASE_URL = getBaseUrl();
+/**
+ * 🔴 CRITICAL: Use ONLY environment variable
+ */
+const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-const testBackend = async (url) => {
-  try {
-    const response = await fetch(`${url}/health`, { method: "GET", cache: "no-store" });
-    return response.ok;
-  } catch {
-    return false;
-  }
-};
+if (!BASE_URL) {
+  throw new Error("❌ REACT_APP_API_BASE_URL is not set");
+}
 
-// Immediately check if backend is reachable; fallback to localhost if needed
-(async () => {
-  const reachable = await testBackend(BASE_URL);
-  if (!reachable && !BASE_URL.includes("localhost")) {
-    console.warn(`⚠️ Backend not reachable at ${BASE_URL}, switching to localhost.`);
-    BASE_URL = `${window.location.protocol}//localhost:8000`;
-  }
-  console.log("✅ Using API Base URL:", BASE_URL);
-})();
+console.log("✅ API BASE URL:", BASE_URL);
 
-// ----------------------
-// Axios Client
-// ----------------------
+/**
+ * ----------------------
+ * Axios Client
+ * ----------------------
+ */
 const authClient = axios.create({
   baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
 });
 
-// ----------------------
-// Login User
-// ----------------------
+/**
+ * ----------------------
+ * Login User (FORM DATA - REQUIRED)
+ * ----------------------
+ */
 export const loginUser = async (username, password) => {
   const formData = new URLSearchParams();
-  formData.append("username", username); // STRICT: do not change case
+  formData.append("username", username); // STRICT
   formData.append("password", password);
 
-  // Let Axios throw errors; frontend handles them
-  const response = await authClient.post("/users/token", formData, {
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  });
+  const response = await axios.post(
+    `${BASE_URL}/users/token`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }
+  );
 
   const user = response.data;
 
@@ -56,31 +50,42 @@ export const loginUser = async (username, password) => {
   return user;
 };
 
-// ----------------------
-// Register User
-// ----------------------
-export const registerUser = async ({ username, password, roles, admin_password }) => {
+/**
+ * ----------------------
+ * Register User (JSON)
+ * ----------------------
+ */
+export const registerUser = async ({
+  username,
+  password,
+  roles,
+  admin_password,
+}) => {
   const response = await authClient.post("/users/register/", {
     username,
     password,
-    roles, // array of roles
+    roles,
     admin_password,
   });
 
   return response.data;
 };
 
-// ----------------------
-// Get Current User
-// ----------------------
+/**
+ * ----------------------
+ * Get Current User
+ * ----------------------
+ */
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem("user");
   return userStr ? JSON.parse(userStr) : null;
 };
 
-// ----------------------
-// Logout
-// ----------------------
+/**
+ * ----------------------
+ * Logout
+ * ----------------------
+ */
 export const logoutUser = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
