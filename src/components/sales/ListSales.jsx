@@ -42,6 +42,12 @@ const ListSales = () => {
     try {
       const axiosInstance = axiosWithAuth();
 
+      console.log("axiosInstance:", axiosInstance); // 🔥 DEBUG LINE
+
+      if (!axiosInstance || typeof axiosInstance.get !== "function") {
+        throw new Error("Axios instance is invalid");
+      }
+
       const params = {
         start_date: startDate,
         end_date: endDate,
@@ -51,20 +57,7 @@ const ListSales = () => {
 
       const data = response.data;
 
-      console.log("🔥 Sales API response:", data);
-
-      // --------------------------
-      // SAFE CHECK (IMPORTANT FOR RAILWAY)
-      // --------------------------
-      if (!data) {
-        throw new Error("Empty server response");
-      }
-
-      if (!Array.isArray(data.sales)) {
-        throw new Error(data.detail || "Invalid sales response format");
-      }
-
-      setSales(data.sales);
+      setSales(Array.isArray(data.sales) ? data.sales : []);
 
       setSummary(
         data.summary || {
@@ -74,14 +67,9 @@ const ListSales = () => {
         }
       );
     } catch (err) {
-      console.error("❌ Sales fetch error:", err);
+      console.error("Fetch sales error:", err);
 
-      const msg =
-        err?.message ||
-        err?.response?.data?.detail ||
-        "Failed to load sales (production)";
-
-      setError(msg);
+      setError(err?.message || "Failed to load sales records");
 
       setSales([]);
       setSummary({
@@ -93,6 +81,7 @@ const ListSales = () => {
       setLoading(false);
     }
   }, [startDate, endDate]);
+
 
   useEffect(() => {
     fetchSales();
