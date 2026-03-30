@@ -70,7 +70,16 @@ const ListSales = () => {
 
       console.log("Sales API response:", data);
 
-      const salesData = Array.isArray(data?.sales) ? data.sales : [];
+      // ✅ FIX: handle all possible backend shapes
+      let salesData = [];
+
+      if (Array.isArray(data)) {
+        salesData = data;
+      } else if (Array.isArray(data?.sales)) {
+        salesData = data.sales;
+      } else if (Array.isArray(data?.items)) {
+        salesData = data.items;
+      }
 
       setSales(salesData);
 
@@ -81,6 +90,7 @@ const ListSales = () => {
           total_balance: 0,
         }
       );
+
     } catch (err) {
       console.error("Fetch sales error:", err);
 
