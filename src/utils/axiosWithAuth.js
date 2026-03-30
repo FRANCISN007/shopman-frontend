@@ -1,50 +1,37 @@
 import axios from "axios";
 
-/**
- * Creates an axios instance with authorization and optional license key headers.
- * Automatically uses REACT_APP_API_BASE_URL for backend URL.
- */
-const axiosWithAuth = () => {
-  // Get token and license key from localStorage
+const instance = axios.create({
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8000",
+});
+
+// attach token dynamically
+instance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-  const licenseKey = localStorage.getItem("license_key"); // optional
+  const licenseKey = localStorage.getItem("license_key");
 
-  // Create axios instance
-  const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8000",
-    //baseURL: process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000",
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    
+  if (licenseKey) {
+    config.headers["X-License-Key"] = licenseKey;
+  }
 
-    headers: {
-      Authorization: token ? `Bearer ${token}` : "",
-      ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
-    },
-  });
+  if (!(config.data instanceof FormData)) {
+    config.headers["Content-Type"] = "application/json";
+  }
 
-  // Interceptor: set Content-Type only for non-FormData
-  instance.interceptors.request.use((config) => {
-    if (!(config.data instanceof FormData)) {
-      config.headers["Content-Type"] = "application/json";
-    } else {
-      delete config.headers["Content-Type"];
+  return config;
+});
+
+instance.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (!err.response) {
+      return Promise.reject({ message: "Network error" });
     }
-    return config;
-  });
+    return Promise.reject(err.response.data);
+  }
+);
 
-  // Response interceptor for unified error handling
-  instance.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (!error.response) {
-        console.error("❌ Network or backend not reachable", error);
-        return Promise.reject({ message: "Network or backend not reachable" });
-      }
-      return Promise.reject(error.response.data || { message: "API request failed" });
-    }
-  );
-
-  return instance;
-};
-
-export default axiosWithAuth;
+export default instance;
