@@ -4,23 +4,20 @@ import axios from "axios";
 /**
  * ✅ API Base URL
  * Priority:
- * 1. Railway / Production → REACT_APP_API_BASE_URL
- * 2. Local development → fallback to current host
+ * 1. Railway env variable
+ * 2. Local fallback
  */
 const BASE_URL =
   process.env.REACT_APP_API_BASE_URL ||
   `${window.location.protocol}//${window.location.hostname}:8000`;
 
-console.log("🌍 API Base URL:", BASE_URL);
+console.log("🧪 Login API Base URL:", BASE_URL);
 
 /**
- * ✅ Axios instance
+ * ✅ Axios instance (no auth needed here)
  */
 const authClient = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 /**
@@ -40,7 +37,7 @@ export const loginUser = async (username, password) => {
 
     const user = response.data;
 
-    // Save user (token + info)
+    // ✅ Save full user object (important for axiosWithAuth)
     localStorage.setItem("user", JSON.stringify(user));
 
     return user;
@@ -52,7 +49,7 @@ export const loginUser = async (username, password) => {
     } else if (error.request) {
       throw { message: "No response from server. Check backend URL." };
     } else {
-      throw { message: "Unexpected error occurred during login." };
+      throw { message: "Unexpected error during login." };
     }
   }
 };
@@ -83,7 +80,7 @@ export const registerUser = async ({
     } else if (error.request) {
       throw { message: "No response from server. Check backend URL." };
     } else {
-      throw { message: "Unexpected error occurred during registration." };
+      throw { message: "Unexpected error during registration." };
     }
   }
 };
@@ -96,7 +93,7 @@ export const getCurrentUser = () => {
     const userStr = localStorage.getItem("user");
     return userStr ? JSON.parse(userStr) : null;
   } catch (err) {
-    console.error("❌ Error reading user from storage:", err);
+    console.error("❌ Error reading user:", err);
     return null;
   }
 };
@@ -106,4 +103,5 @@ export const getCurrentUser = () => {
  */
 export const logoutUser = () => {
   localStorage.removeItem("user");
+  window.location.href = "/login"; // optional redirect
 };
