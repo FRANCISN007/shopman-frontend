@@ -5,17 +5,32 @@ const BASE_URL =
   "https://shopman-backend-production.up.railway.app";
 
 const axiosWithAuth = () => {
-  const token =
-    JSON.parse(localStorage.getItem("user"))?.access_token ||
-    localStorage.getItem("token");
+  let token = null;
 
-  return axios.create({
+  try {
+    const user = localStorage.getItem("user");
+    token = user ? JSON.parse(user)?.access_token : null;
+  } catch (e) {
+    token = null;
+  }
+
+  if (!token) {
+    token = localStorage.getItem("token");
+  }
+
+  const instance = axios.create({
     baseURL: BASE_URL,
     headers: {
       "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
     },
   });
+
+  // 🔥 ONLY add Authorization if token exists
+  if (token) {
+    instance.defaults.headers.common.Authorization = `Bearer ${token}`;
+  }
+
+  return instance;
 };
 
 export default axiosWithAuth;

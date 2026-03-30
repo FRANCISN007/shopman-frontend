@@ -98,6 +98,7 @@ export const getCurrentUser = () => {
   }
 };
 
+
 /**
  * ✅ Logout user
  */
@@ -105,3 +106,4 @@ export const logoutUser = () => {
   localStorage.removeItem("user");
   window.location.href = "/login"; // optional redirect
 };
+

@@ -14,6 +14,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
+    
 
     try {
       // STRICT: do not change case
