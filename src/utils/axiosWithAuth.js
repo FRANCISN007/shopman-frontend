@@ -1,34 +1,43 @@
 import axios from "axios";
 
-const BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  "https://shopman-backend-production.up.railway.app";
-
 const axiosWithAuth = () => {
-  let token = null;
-
-  try {
-    const user = localStorage.getItem("user");
-    token = user ? JSON.parse(user)?.access_token : null;
-  } catch (e) {
-    token = null;
-  }
-
-  if (!token) {
-    token = localStorage.getItem("token");
-  }
+  const token = localStorage.getItem("token");
+  const licenseKey = localStorage.getItem("license_key");
 
   const instance = axios.create({
-    baseURL: BASE_URL,
+    baseURL:
+      process.env.REACT_APP_API_BASE_URL ||
+      "https://shopman-backend-production.up.railway.app", // 🔥 production fallback
+
     headers: {
-      "Content-Type": "application/json",
+      Authorization: token ? `Bearer ${token}` : "",
+      ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
     },
   });
 
-  // 🔥 ONLY add Authorization if token exists
-  if (token) {
-    instance.defaults.headers.common.Authorization = `Bearer ${token}`;
-  }
+  instance.interceptors.request.use((config) => {
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    } else {
+      delete config.headers["Content-Type"];
+    }
+    return config;
+  });
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (!error.response) {
+        return Promise.reject({
+          message: "Network or backend not reachable (production)",
+        });
+      }
+
+      return Promise.reject(
+        error.response.data || { message: "API request failed" }
+      );
+    }
+  );
 
   return instance;
 };

@@ -12,73 +12,76 @@ const ListSales = () => {
     total_balance: 0,
   });
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [show, setShow] = useState(true);
 
-  const formatAmount = (value) =>
-    Number(value || 0).toLocaleString("en-US");
+  // --------------------------
+  // Helpers (UNCHANGED)
+  // --------------------------
+  const getSaleDiscountTotal = (items = []) =>
+    items.reduce((sum, item) => sum + Number(item.discount || 0), 0);
 
-  // =========================
-  // SAFE API FETCH (ANALYSIS STYLE)
-  // =========================
+  const getSaleGrossTotal = (items = []) =>
+    items.reduce((sum, item) => sum + Number(item.gross_amount || 0), 0);
+
+  const formatAmount = (amount) =>
+    Number(amount || 0).toLocaleString("en-US");
+
+  // --------------------------
+  // FETCH SALES (DEPLOYMENT SAFE)
+  // --------------------------
   const fetchSales = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
-      setError("");
-
-      const api = axiosWithAuth();
-
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
-      const isSuperAdmin = user?.roles?.includes("super_admin");
+      const axiosInstance = axiosWithAuth();
 
       const params = {
         start_date: startDate,
         end_date: endDate,
       };
 
-      // 🔥 match backend requirement
-      if (isSuperAdmin && user?.business_id) {
-        params.business_id = user.business_id;
+      const response = await axiosInstance.get("/sales/", { params });
+
+      const data = response.data;
+
+      console.log("🔥 Sales API response:", data);
+
+      // --------------------------
+      // SAFE CHECK (IMPORTANT FOR RAILWAY)
+      // --------------------------
+      if (!data) {
+        throw new Error("Empty server response");
       }
 
-      const res = await api.get("/sales/", { params });
-
-      console.log("Sales API response:", res.data);
-
-      const data = res.data;
-
-      // =========================
-      // MATCH ALL POSSIBLE SHAPES
-      // =========================
-      let salesData = [];
-
-      if (Array.isArray(data)) {
-        salesData = data;
-      } else if (Array.isArray(data?.sales)) {
-        salesData = data.sales;
-      } else if (Array.isArray(data?.items)) {
-        salesData = data.items;
+      if (!Array.isArray(data.sales)) {
+        throw new Error(data.detail || "Invalid sales response format");
       }
 
-      setSales(salesData);
+      setSales(data.sales);
 
       setSummary(
-        data?.summary || {
+        data.summary || {
           total_sales: 0,
           total_paid: 0,
           total_balance: 0,
         }
       );
     } catch (err) {
-      console.error("Fetch sales error:", err);
+      console.error("❌ Sales fetch error:", err);
 
-      setError(
-        err.response?.data?.detail || "Failed to load sales records."
-      );
+      const msg =
+        err?.message ||
+        err?.response?.data?.detail ||
+        "Failed to load sales (production)";
+
+      setError(msg);
 
       setSales([]);
       setSummary({
@@ -97,30 +100,13 @@ const ListSales = () => {
 
   if (!show) return null;
 
-  // =========================
-  // SAFE HELPERS (ANALYSIS STYLE)
-  // =========================
-  const safeItems = (items) => Array.isArray(items) ? items : [];
-
-  const getSaleGrossTotal = (items) =>
-    safeItems(items).reduce(
-      (sum, item) => sum + Number(item?.gross_amount || 0),
-      0
-    );
-
-  const getSaleDiscountTotal = (items) =>
-    safeItems(items).reduce(
-      (sum, item) => sum + Number(item?.discount || 0),
-      0
-    );
-
   return (
     <div className="list-sales-container">
       <button className="close-btn" onClick={() => setShow(false)}>
         ✖
       </button>
 
-      <h2>📄 Sales List Records</h2>
+      <h2 className="list-sales-title">📄 Sales List Records</h2>
 
       {/* FILTERS */}
       <div className="sales-filters">
@@ -145,9 +131,11 @@ const ListSales = () => {
         <button onClick={fetchSales}>Filter</button>
       </div>
 
-      {loading && <p>Loading sales...</p>}
+      {/* STATUS */}
+      {loading && <p className="status-text">Loading sales...</p>}
       {error && !loading && <p className="error-text">{error}</p>}
 
+      {/* TABLE */}
       {!loading && !error && (
         <div className="table-wrapper">
           <table className="sales-table">
@@ -156,8 +144,8 @@ const ListSales = () => {
                 <th>#</th>
                 <th>Invoice No</th>
                 <th>Customer</th>
-                <th>Phone</th>
-                <th>Ref</th>
+                <th>Phone No</th>
+                <th>Reference</th>
                 <th>Products</th>
                 <th className="text-right">Gross</th>
                 <th className="text-right">Discount</th>
@@ -172,63 +160,58 @@ const ListSales = () => {
             <tbody>
               {sales.length === 0 ? (
                 <tr>
-                  <td colSpan="13">No sales records found</td>
+                  <td colSpan="13" className="empty-row">
+                    No sales records found
+                  </td>
                 </tr>
               ) : (
-                sales.map((sale, index) => {
-                  const items = safeItems(sale?.items);
+                sales.map((sale, index) => (
+                  <tr key={sale.id || index}>
+                    <td>{index + 1}</td>
+                    <td>{sale.invoice_no || "-"}</td>
+                    <td>{sale.customer_name || "Walk-in"}</td>
+                    <td>{sale.customer_phone || "-"}</td>
+                    <td>{sale.ref_no || "-"}</td>
 
-                  return (
-                    <tr key={sale?.id || index}>
-                      <td>{index + 1}</td>
-                      <td>{sale?.invoice_no || "-"}</td>
-                      <td>{sale?.customer_name || "Walk-in"}</td>
-                      <td>{sale?.customer_phone || "-"}</td>
-                      <td>{sale?.ref_no || "-"}</td>
+                    <td>
+                      {sale.items?.length
+                        ? sale.items.map((i) => i.product_name).join(", ")
+                        : "-"}
+                    </td>
 
-                      <td>
-                        {items.length
-                          ? items
-                              .map((i) => i?.product_name)
-                              .filter(Boolean)
-                              .join(", ")
-                          : "-"}
-                      </td>
+                    <td className="text-right">
+                      {formatAmount(getSaleGrossTotal(sale.items))}
+                    </td>
 
-                      <td className="text-right">
-                        {formatAmount(getSaleGrossTotal(items))}
-                      </td>
+                    <td className="text-right">
+                      {formatAmount(getSaleDiscountTotal(sale.items))}
+                    </td>
 
-                      <td className="text-right">
-                        {formatAmount(getSaleDiscountTotal(items))}
-                      </td>
+                    <td className="text-right">
+                      {formatAmount(sale.total_amount)}
+                    </td>
 
-                      <td className="text-right">
-                        {formatAmount(sale?.total_amount)}
-                      </td>
+                    <td className="text-right">
+                      {formatAmount(sale.total_paid)}
+                    </td>
 
-                      <td className="text-right">
-                        {formatAmount(sale?.total_paid)}
-                      </td>
+                    <td className="text-right">
+                      {formatAmount(sale.balance_due)}
+                    </td>
 
-                      <td className="text-right">
-                        {formatAmount(sale?.balance_due)}
-                      </td>
+                    <td>{sale.payment_status || "-"}</td>
 
-                      <td>{sale?.payment_status || "-"}</td>
-
-                      <td>
-                        {sale?.sold_at
-                          ? new Date(sale.sold_at).toLocaleString()
-                          : "-"}
-                      </td>
-                    </tr>
-                  );
-                })
+                    <td>
+                      {sale.sold_at
+                        ? new Date(sale.sold_at).toLocaleString()
+                        : "-"}
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
 
-            {/* TOTALS (ANALYSIS STYLE LOGIC) */}
+            {/* TOTALS */}
             {sales.length > 0 && (
               <tfoot>
                 <tr className="sales-total-row">
@@ -237,8 +220,7 @@ const ListSales = () => {
                   <td className="text-right">
                     {formatAmount(
                       sales.reduce(
-                        (sum, s) =>
-                          sum + getSaleGrossTotal(safeItems(s.items)),
+                        (sum, sale) => sum + getSaleGrossTotal(sale.items),
                         0
                       )
                     )}
@@ -247,8 +229,7 @@ const ListSales = () => {
                   <td className="text-right">
                     {formatAmount(
                       sales.reduce(
-                        (sum, s) =>
-                          sum + getSaleDiscountTotal(safeItems(s.items)),
+                        (sum, sale) => sum + getSaleDiscountTotal(sale.items),
                         0
                       )
                     )}
