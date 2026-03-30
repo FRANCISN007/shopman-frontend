@@ -1,89 +1,50 @@
 import axios from "axios";
 
 /**
- * 🔴 CRITICAL: Do NOT fallback to localhost in production
+ * Creates an axios instance with authorization and optional license key headers.
+ * Automatically uses REACT_APP_API_BASE_URL for backend URL.
  */
-const baseURL = process.env.REACT_APP_API_BASE_URL;
+const axiosWithAuth = () => {
+  // Get token and license key from localStorage
+  const token = localStorage.getItem("token");
+  const licenseKey = localStorage.getItem("license_key"); // optional
 
-if (!baseURL) {
-  throw new Error("❌ REACT_APP_API_BASE_URL is not set");
-}
+  // Create axios instance
+  const instance = axios.create({
+    baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8000",
+    //baseURL: process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000",
 
-/**
- * Create axios instance
- */
-const axiosWithAuth = axios.create({
-  baseURL,
-});
+    
 
-/**
- * REQUEST INTERCEPTOR
- */
-axiosWithAuth.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    const licenseKey = localStorage.getItem("license_key");
+    headers: {
+      Authorization: token ? `Bearer ${token}` : "",
+      ...(licenseKey ? { "X-License-Key": licenseKey } : {}),
+    },
+  });
 
-    // ✅ Attach token dynamically (important)
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  // Interceptor: set Content-Type only for non-FormData
+  instance.interceptors.request.use((config) => {
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    } else {
+      delete config.headers["Content-Type"];
     }
-
-    // ✅ Attach license key if available
-    if (licenseKey) {
-      config.headers["X-License-Key"] = licenseKey;
-    }
-
-    /**
-     * 🔥 IMPORTANT:
-     * Only set Content-Type if NOT already set
-     * This prevents breaking login (form-urlencoded)
-     */
-    if (!config.headers["Content-Type"]) {
-      if (!(config.data instanceof FormData)) {
-        config.headers["Content-Type"] = "application/json";
-      }
-    }
-
     return config;
-  },
-  (error) => Promise.reject(error)
-);
+  });
 
-/**
- * RESPONSE INTERCEPTOR
- */
-axiosWithAuth.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    /**
-     * 🔴 Network error (backend unreachable / CORS / timeout)
-     */
-    if (!error.response) {
-      return Promise.reject({
-        message: "Network error: Unable to reach server",
-      });
-    }
-
-    /**
-     * 🔴 Unauthorized (optional handling)
-     */
-    if (error.response.status === 401) {
-      // Optional: auto logout
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      // window.location.href = "/login";
-    }
-
-    /**
-     * Return backend error message cleanly
-     */
-    return Promise.reject(
-      error.response.data || {
-        message: "API request failed",
+  // Response interceptor for unified error handling
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (!error.response) {
+        console.error("❌ Network or backend not reachable", error);
+        return Promise.reject({ message: "Network or backend not reachable" });
       }
-    );
-  }
-);
+      return Promise.reject(error.response.data || { message: "API request failed" });
+    }
+  );
+
+  return instance;
+};
 
 export default axiosWithAuth;
