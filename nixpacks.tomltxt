@@ -12,3 +12,6 @@ cmds = ["npm run build"]
 
 [start]
 cmd = "npm start"
+
+
+"start": "serve -s build -l $PORT --gzip --cache 31536000",
