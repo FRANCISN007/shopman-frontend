@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "react-scripts build",
-    "start": "serve -s build -l 3000",
+    "start": "serve -s build -l $PORT --gzip --cache 31536000",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "echo CLEAN BUILD"
