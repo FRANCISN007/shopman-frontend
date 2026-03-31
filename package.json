@@ -21,13 +21,12 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
+    "start": "serve -s build -l 3000",
     "build": "react-scripts build",
-    "start": "serve -s build -l $PORT",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "echo CLEAN BUILD"
   },
-
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -49,6 +48,5 @@
   "devDependencies": {
     "typescript": "^4.9.5"
   },
-
   "homepage": "/"
 }
