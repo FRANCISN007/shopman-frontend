@@ -15,3 +15,11 @@ cmd = "npm start"
 
 
 "start": "serve -s build -l $PORT --gzip --cache 31536000",
+
+"scripts": {
+    "start": "serve -s build -l $PORT",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "postinstall": "echo CLEAN BUILD"
+  },
