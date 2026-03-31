@@ -3,12 +3,18 @@ const path = require("path");
 
 const app = express();
 
-// Serve static files from React build
+// FORCE absolute path logging (debug)
+console.log("__dirname:", __dirname);
+console.log("Build path:", path.join(__dirname, "build"));
+
+// Serve static files
 app.use(express.static(path.join(__dirname, "build")));
 
-// Catch all routes and return React app
+// React catch-all
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
+  const filePath = path.join(__dirname, "build", "index.html");
+  console.log("Serving:", filePath);
+  res.sendFile(filePath);
 });
 
 const PORT = process.env.PORT || 8080;
