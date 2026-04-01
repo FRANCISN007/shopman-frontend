@@ -6,7 +6,7 @@
 html, body {
   height: 100%;
   margin: 0;
-  overflow-x: hidden;
+  overflow: hidden;
   background: #344153;
 }
 
@@ -96,9 +96,7 @@ html, body {
 
 /* ================= PROCEED BUTTON ================= */
 .proceed-button {
-  position: relative;
-  margin-top: 20px;
-
+  position: fixed;
   top: 50%;
   right: 20px;
   transform: translateY(-50%);
@@ -247,12 +245,19 @@ html, body {
 }
 
 /* ================= RESPONSIVE ================= */
-
-/* Tablets */
 @media (max-width: 768px) {
   .hems-text {
     font-size: 3rem;
-    gap: 12px;
+  }
+
+  .proceed-button {
+    top: auto;
+    bottom: 20px;
+    right: 50%;
+    transform: translateX(50%);
+    width: 80%;
+    max-width: 300px;
+    font-size: 16px;
   }
 
   .crystal {
@@ -264,75 +269,4 @@ html, body {
     width: 200px;
     height: 200px;
   }
-
-  .home-card {
-    max-width: 90%;
-  }
 }
-
-/* Phones */
-@media (max-width: 480px) {
-  .hems-text {
-    font-size: 2.2rem;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .logo-badge {
-    font-size: 1rem;
-    padding: 5px 12px;
-  }
-
-  .crystal {
-    width: 85px;
-    height: 85px;
-  }
-
-  .crystal-glow {
-    width: 160px;
-    height: 160px;
-  }
-
-  .proceed-button {
-    position: fixed;
-    bottom: 18px;
-    top: auto;
-    right: 50%;
-    transform: translateX(50%);
-
-    width: 85%;
-    max-width: 280px;
-
-    font-size: 15px;
-    padding: 12px 20px;
-  }
-
-  .home-footer {
-    position: fixed;
-    bottom: 5px;
-    right: 10px;
-    left: 10px;
-
-    font-size: 0.75rem;
-    text-align: center;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 360px) {
-  .hems-text {
-    font-size: 1.8rem;
-  }
-
-  .crystal {
-    width: 70px;
-    height: 70px;
-  }
-
-  .proceed-button {
-    width: 90%;
-    font-size: 14px;
-  }
-}
-
-
