@@ -18,7 +18,8 @@
     "react-scripts": "5.0.1",
     "serve": "^14.2.6",
     "web-vitals": "^2.1.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yaml": "^2.8.3"
   },
   "scripts": {
     "start": "serve -s build -l $PORT",
