@@ -109,8 +109,7 @@ const HomePage = () => {
 
         {/* FOOTER */}
         <footer className="home-footer">
-          <div>Produced & Licensed by School of Accounting Package</div>
-          <div>© 2026</div>
+          <div>Produced & Licensed by School of Accounting Package © 2026</div>
         </footer>
       </div>
     </>
