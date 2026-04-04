@@ -91,7 +91,7 @@ const HomePage = () => {
 
   {/* ✨ NEW PROFESSIONAL TEXT */}
     <div className="welcome-text">
-      <h1>Welcome to Shopman</h1>
+      <h1>Welcome to Shopman Business App</h1>
       <p>
         Your trusted and reliable solution for managing and growing your business efficiently.
       </p>
