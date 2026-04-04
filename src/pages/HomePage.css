@@ -291,8 +291,8 @@ html, body {
 }
 
 .welcome-text p {
-  font-size: 17px;
-  line-height: 1.0;
+  font-size: 20px;
+  line-height: 1.9;
   color: #0aff02;
   max-width: 420px;
   margin: 0 auto;
