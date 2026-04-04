@@ -291,9 +291,9 @@ html, body {
 }
 
 .welcome-text p {
-  font-size: 15px;
-  line-height: 1.6;
-  color: #02ff2c;
+  font-size: 17px;
+  line-height: 1.0;
+  color: #0aff02;
   max-width: 420px;
   margin: 0 auto;
   font-family: "Audiowide", sans-serif;
