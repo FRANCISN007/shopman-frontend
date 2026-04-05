@@ -428,3 +428,102 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
   background: #ccc;
   border-radius: 3px;
 }
+
+
+
+/* ===============================
+   MOBILE OPTIMIZATION (CRITICAL)
+================================= */
+@media (max-width: 600px) {
+
+  .create-purchase-container {
+    padding: 15px 12px;
+  }
+
+  .create-purchase-container h2 {
+    font-size: 18px;
+  }
+
+  /* Hide table header on mobile */
+  .table-header {
+    display: none;
+  }
+
+  /* Convert each row to card */
+  .table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #fafafa;
+  }
+
+  /* Inputs full width */
+  .table-row input {
+    width: 100%;
+    font-size: 14px;
+    height: 38px;
+  }
+
+  /* Label simulation */
+  .table-row::before {
+    content: "Item";
+    font-weight: 600;
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 4px;
+  }
+
+  /* Product search full width */
+  .product-search input {
+    width: 100%;
+  }
+
+  /* Quantity + price side by side */
+  .table-row .qty-input,
+  .table-row input[type="number"] {
+    width: 100%;
+  }
+
+  /* Make remove button bigger */
+  .remove-btn {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  /* Buttons */
+  .add-row-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .submit-button {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Invoice total */
+  .invoice-total {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  /* Top form fields stack */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Close button smaller */
+  .close-btn {
+    top: 10px;
+    right: 10px;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+}
+
