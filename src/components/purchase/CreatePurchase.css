@@ -2,7 +2,7 @@
    MAIN CONTAINER
 ================================= */
 .create-purchase-container {
-  max-width: 1200px;
+  max-width: 900px;
   width: 95%;
   margin: 20px auto;
   background: #ffffff;
@@ -120,7 +120,7 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
 /* TABLE HEADER */
 .table-header {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr 1.5fr 1.5fr 0.6fr; /* Barcode + Product + Qty + Unit + Total + Action */
+  grid-template-columns: 2fr 1.6fr 1.9fr 1.9fr 1.4fr 0.6fr; /* Barcode + Product + Qty + Unit + Total + Action */
   padding: 10px 12px;
   font-weight: 600;
   font-size: 14px;
@@ -134,15 +134,15 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
 ================================= */
 .table-row {
   display: grid;
-  grid-template-columns: 2fr 3fr 1fr 1.5fr 1.5fr 0.6fr; /* Barcode + Product + Qty + Unit + Total + Action */
-  gap: 8px;
-  padding: 6px 8px;
+  grid-template-columns: 0.6fr 3fr 0.5fr 1.5fr 1.5fr 0.6fr; /* Barcode + Product + Qty + Unit + Total + Action */
+  gap: 2px;
+  padding: 6px 1px;
   align-items: center; /* vertically center content */
   border-bottom: 1px solid #e5e7eb;
 }
 
 .table-row input {
-  padding: 6px 8px;
+  padding: 2px 1px;
   border: 1px solid #d1d5db;
   border-radius: 4px;
   font-size: 13px;
@@ -163,17 +163,7 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
   cursor: not-allowed;
 }
 
-/* Responsive fixes */
-@media (max-width: 900px) {
-  .table-header, .table-row {
-    grid-template-columns: 1.5fr 3fr 1fr 1fr 1fr 0.6fr;
-    font-size: 13px;
-  }
 
-  .product-search input {
-    font-size: 13px;
-  }
-}
 
 
 .table-row input:focus {
@@ -192,7 +182,7 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
 ================================= */
 .product-search {
   position: relative;
-  width: 100%;
+  width: 120%;
 }
 
 .product-search input {
@@ -306,19 +296,6 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
 
 
 
-/* ===============================
-   RESPONSIVE FIXES
-================================= */
-@media (max-width: 900px) {
-  .table-header, .table-row {
-    grid-template-columns: 1.5fr 3fr 1fr 1fr 1fr 0.6fr;
-    font-size: 13px;
-  }
-
-  .product-search input {
-    font-size: 13px;
-  }
-}
 
 
 /* ===============================
@@ -428,3 +405,4 @@ overflow: visible !important;   /* 🔥 VERY IMPORTANT */
   background: #ccc;
   border-radius: 3px;
 }
+
