@@ -123,7 +123,7 @@ html, body {
 /* ================= FOOTER ================= */
 .home-footer {
   position: fixed;
-  bottom: px;
+  bottom: 1px;
   right: 20px;
 
   color: #000000;
