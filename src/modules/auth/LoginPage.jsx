@@ -44,8 +44,13 @@ const LoginPage = () => {
   };
 
   return (
+    
     <div className="auth-page-wrapper">
+
+      {/* 🪄 LOGO - TOP CENTER */}
+
       {/* LEFT SIDE DESCRIPTION */}
+      
       <div className="auth-left-panel">
         <h1 className="app-title">SHopMan App</h1>
         <p className="app-description">
@@ -67,9 +72,11 @@ const LoginPage = () => {
 
       {/* RIGHT SIDE LOGIN FORM */}
       <div className="auth-container">
-        <div className="auth-logo-text">
-          SHopMan <span>App</span>
+        <div className="logo-badgelogin">
+          <span className="logo-icon">◆</span>
+          <span>ShopMan</span>
         </div>
+
 
         <h2>Login</h2>
 
@@ -94,9 +101,11 @@ const LoginPage = () => {
 
           {error && <div className="error">{error}</div>}
 
-          <button type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? <span className="spinner"></span> : "Login"}
           </button>
+
+
         </form>
       </div>
 

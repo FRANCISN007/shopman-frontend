@@ -76,7 +76,7 @@ html, body {
 
   font-size: 1.2rem;
   font-weight: bold;
-  color: #61dafb;
+  color: #08c3f7;
 
   padding: 6px 16px;
   border-radius: 25px;
@@ -123,7 +123,7 @@ html, body {
 /* ================= FOOTER ================= */
 .home-footer {
   position: fixed;
-  bottom: 1px;
+  bottom: 0px;
   right: 20px;
 
   color: #000000;
