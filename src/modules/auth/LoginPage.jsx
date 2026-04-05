@@ -49,19 +49,19 @@ const LoginPage = () => {
       <div className="auth-left-panel">
         <h1 className="app-title">SHopMan App</h1>
         <p className="app-description">
-          This App is a complete Inventory management & Sales solution designed to
+          This App is a complete Inventory management system & Sales solution designed to
           simplify, automate, and centralize operations across:
         </p>
         <ul className="app-features">
           <li>POS Sales Point</li>
           <li>Purchases</li>
           <li>Payments & Receipts</li>
-          <li>Secured Database Integration</li>
-          <li>Stock & Inventory Control</li>
+          <li>Stock Valuation </li>
+          <li>Debtor Control</li>
           <li>Profit & Loss Account</li>
         </ul>
         <p className="app-tagline">
-          Fast • Reliable • All-in-One Inventory Management System
+          User-friendly • Fast • Reliable • All-in-One Inventory Management System
         </p>
       </div>
 
@@ -101,8 +101,8 @@ const LoginPage = () => {
       </div>
 
       <footer className="homes-footer">
-        <div>Produced & Licensed by School of Accounting Package</div>
-        <div>© 2025</div>
+        <div>Produced & Licensed by School of Accounting Package © 2026</div>
+        
       </footer>
     </div>
   );

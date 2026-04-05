@@ -127,10 +127,10 @@
 /* ====== Footer ====== */
 .homes-footer {
   position: fixed;
-  bottom: 10px;
+  bottom: 0px;
   right: 20px;
   color: rgb(19, 17, 17);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-align: right;
   font-style: italic;
 }

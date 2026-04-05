@@ -123,11 +123,11 @@ html, body {
 /* ================= FOOTER ================= */
 .home-footer {
   position: fixed;
-  bottom: 10px;
+  bottom: px;
   right: 20px;
 
   color: #000000;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-style: italic;
   text-align: right;
 
