@@ -6,7 +6,7 @@ import "./CreateExpenses.css";
 
 
 const ACCOUNT_TYPES = [
-  "Transportation/Haulage",
+  "Transport/Haulage",
   "Communication",
   "Salary & Wages",
   "Staff Welfare",
@@ -16,17 +16,18 @@ const ACCOUNT_TYPES = [
   "Gifts & Donations",
   "Rates & Levies",
   "Rent",
+  "Generator Maintenance",
+  "Fuel/Diesel",
   "Vehicle Expenses",
   "Security Expenses",
   "Office Expenses",
   "Fumigation Expenses",
-  "Fumigation Expenses",
   "Waste Disposal",
+  "Electrical Expenses",
   "Entertainment",
   "General Expenses",
   "Cost of Sales",
 ];
-
 
 const CreateExpenses = ({ onClose, onSuccess }) => {
   const [vendors, setVendors] = useState([]);
