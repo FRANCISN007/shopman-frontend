@@ -98,7 +98,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="auth-page-wrapper">
+    <div className="auth-page-wrapper1">
       {/* LEFT SIDE DESCRIPTION */}
       <div className="auth-left-panel">
         <h1 className="app-title">SHopMan App</h1>
@@ -120,7 +120,7 @@ const LoginPage = () => {
       </div>
 
       {/* RIGHT SIDE LOGIN FORM */}
-      <div className="auth-container">
+      <div className="auth-container1">
         <div className="logo-badgelogin">
           <span className="logo-icon">◆</span>
           <span>ShopMan</span>
