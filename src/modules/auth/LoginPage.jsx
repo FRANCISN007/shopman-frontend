@@ -4,6 +4,7 @@ import { loginUser } from "../../api/authService";
 import "./LogReg.css";
 import emailjs from "@emailjs/browser";
 
+
 const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -101,6 +102,17 @@ const LoginPage = () => {
     <div className="auth-page-wrapper1">
       {/* LEFT SIDE DESCRIPTION */}
       
+      {/* ================= TOP LEFT SMALL SHOPMAN BRAND ================= */}
+        <div className="shopman-brand-top">
+          <div className="shopman-mini-badge">
+            <img
+              src="/images/shopman-logo.jpeg"
+              alt="ShopMan"
+              className="shopman-mini-logo"
+            />
+            <span>SHopMan</span>
+          </div>
+        </div>
 
       {/* RIGHT SIDE LOGIN FORM */}
       <div className="auth-container1">
