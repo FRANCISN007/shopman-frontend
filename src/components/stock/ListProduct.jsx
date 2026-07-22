@@ -48,6 +48,12 @@ const ListProduct = () => {
   /* ================= Fetch Functions ================= */
 
   const fetchProducts = async () => {
+    // Super Admin must choose a business first
+    if (isSuperAdmin && !selectedBusinessId) {
+      setProducts([]);
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -57,23 +63,13 @@ const ListProduct = () => {
         { params: getParams() }
       );
 
-      setProducts(res.data);
-
+      setProducts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
       setError("Failed to fetch products");
+      setProducts([]);
     } finally {
       setLoading(false);
-    }
-  };
-
-
-  const fetchCategories = async () => {
-    try {
-      const res = await axiosWithAuth().get("/stock/category/simple");
-      setCategories(res.data);
-    } catch (err) {
-      console.error("Failed to load categories:", err);
     }
   };
 
@@ -89,6 +85,17 @@ const ListProduct = () => {
   };
 
 
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosWithAuth().get("/stock/category/simple");
+      setCategories(res.data || []);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  };
+
+  /* ================= Initial Load ================= */
+
   /* ================= Initial Load ================= */
 
   useEffect(() => {
@@ -96,23 +103,38 @@ const ListProduct = () => {
 
     if (isSuperAdmin) {
       fetchBusinesses();
+      setProducts([]);          // Do NOT load products yet
     } else {
-      fetchProducts();
+      fetchProducts();          // Normal users load immediately
     }
   }, []);
 
 
-  useEffect(() => {
-    if (!isSuperAdmin) return;
+  /* ================= Business Changed ================= */
 
-    if (!selectedBusinessId) {
-      setProducts([]);
-      return;
+  useEffect(() => {
+    if (isSuperAdmin) {
+      if (!selectedBusinessId) {
+        setProducts([]);
+        return;
+      }
     }
 
     fetchProducts();
-
   }, [selectedBusinessId, isSuperAdmin]);
+
+
+    useEffect(() => {
+      if (!isSuperAdmin) return;
+
+      if (!selectedBusinessId) {
+        setProducts([]);
+        return;
+      }
+
+      fetchProducts();
+
+    }, [selectedBusinessId, isSuperAdmin]);
 
 
 
@@ -356,16 +378,13 @@ const ListProduct = () => {
         <tbody>
 
           {filteredProducts.length === 0 ? (
-
             <tr>
-              <td colSpan={9} style={{ textAlign: "center" }}>
+              <td colSpan={10} style={{ textAlign: "center" }}>
                 {isSuperAdmin && !selectedBusinessId
-                  ? "Please select a business to view products"
-                  : "No products found"}
+                  ? "Please select a business."
+                  : "No products found."}
               </td>
-
             </tr>
-
           ) : (
 
             filteredProducts.map(p => (
