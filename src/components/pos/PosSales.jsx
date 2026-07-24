@@ -51,6 +51,8 @@ const PosSales = ({ onClose }) => {
 
   const validItems = saleItems.filter(item => item.productId);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   /* ===============================
      Total
   ================================ */
@@ -352,28 +354,41 @@ const PosSales = ({ onClose }) => {
   };
 
   const handleSubmit = async () => {
+
+    // Prevent double submission
+    if (isSubmitting) return;
+
     if (!validateSale()) return;
 
     if (businesses.length > 0 && !businessId) {
-      return alert("Please select a business");
+      alert("Please select a business");
+      return;
     }
 
     if (amountPaid < 0) {
-      return alert("Amount cannot be negative");
+      alert("Amount cannot be negative");
+      return;
     }
 
     if (amountPaid > 0) {
       if (!paymentMethod) {
-        return alert("Select payment method");
+        alert("Select payment method");
+        return;
       }
+
       if (paymentMethod !== "cash" && !bankId) {
-        return alert("Please select a bank");
+        alert("Please select a bank");
+        return;
       }
     }
+
+    // Lock the submit button
+    setIsSubmitting(true);
 
     const token = localStorage.getItem("token");
 
     try {
+
       const salePayload = {
         invoice_date: invoiceDate,
         customer_name: customerName.trim() || "Walk-in",
@@ -393,23 +408,34 @@ const PosSales = ({ onClose }) => {
       const saleRes = await axios.post(
         `${API_BASE_URL}/sales/`,
         salePayload,
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       const invoice = saleRes.data.invoice_no;
       setInvoiceNo(invoice);
 
       if (amountPaid > 0) {
+
         const paymentPayload = {
           amount_paid: amountPaid,
           payment_method: paymentMethod,
-          ...(paymentMethod !== "cash" && { bank_id: bankId }),
+          ...(paymentMethod !== "cash" && {
+            bank_id: bankId,
+          }),
         };
 
         await axios.post(
           `${API_BASE_URL}/payments/${invoice}/payments`,
           paymentPayload,
-          { headers: { Authorization: `Bearer ${token}` } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
       }
 
@@ -419,19 +445,29 @@ const PosSales = ({ onClose }) => {
 
       resetForm();
       setAmountPaid(0);
-      setAmountEdited(false);   // Reset edited flag
+      setAmountEdited(false);
       setBankId("");
       setInvoiceNo("");
 
     } catch (err) {
+
       console.error(err);
+
       const detail = err.response?.data?.detail;
+
       if (Array.isArray(detail)) {
         alert(detail.map(d => d.msg).join("\n"));
       } else {
         alert(detail || "Transaction failed");
       }
+
+    } finally {
+
+      // Unlock button whether success or failure
+      setIsSubmitting(false);
+
     }
+
   };
 
   return (
@@ -725,9 +761,13 @@ const PosSales = ({ onClose }) => {
                   <button className="preview-btn" onClick={handlePrintPreview}>
                     Print Preview
                   </button>
-                  <button className="submit-btn" onClick={handleSubmit}>
-                    🖨️ Print Receipt
-                  </button>
+                  <button
+                    className="submit-btn"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? "Saving Sale..." : "🖨️ Print Receipt"}
+                </button>
                 </div>
               </div>
             </div>

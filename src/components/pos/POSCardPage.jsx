@@ -105,6 +105,9 @@ const POSCardPage = () => {
 
   const [receiptFormat, setReceiptFormat] = useState("80mm");
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+
   
   // 1️⃣ Define the fetch function
   const fetchProducts = async () => {
@@ -444,19 +447,36 @@ const handleLoadInvoice = async (invoiceNo) => {
   // SUBMIT SALE
   // =========================
   const handleSubmit = async () => {
-    if (!cartItems.length) return alert("Cart is empty");
-    if (amountPaid < 0)
-      return alert("Amount cannot be negative");
+
+    // Prevent double click
+    if (isSubmitting) return;
+
+    // ✅ Validate first
+    if (!cartItems.length) {
+      alert("Cart is empty");
+      return;
+    }
+
+    if (amountPaid < 0) {
+      alert("Amount cannot be negative");
+      return;
+    }
 
     // Only validate payment if amountPaid > 0
     if (amountPaid > 0) {
-      if (!paymentMethod)
-        return alert("Select payment method");
+      if (!paymentMethod) {
+        alert("Select payment method");
+        return;
+      }
 
-      if (paymentMethod !== "cash" && !bankId)
-        return alert("Please select a bank");
+      if (paymentMethod !== "cash" && !bankId) {
+        alert("Please select a bank");
+        return;
+      }
     }
 
+    // ✅ Lock submission after validation
+    setIsSubmitting(true);
 
     const token = localStorage.getItem("token");
 
@@ -476,7 +496,6 @@ const handleLoadInvoice = async (invoiceNo) => {
         ...(businessId && { business_id: businessId }),
       };
 
-
       const saleRes = await axiosWithAuth(token).post("/sales/", salePayload);
       const invoiceNo = saleRes.data.invoice_no;
 
@@ -493,23 +512,29 @@ const handleLoadInvoice = async (invoiceNo) => {
         );
       }
 
-
-
       handlePrintReceipt(invoiceNo);
 
       alert("Sale completed successfully");
 
-      // ✅ RESET EVERYTHING
+      // ✅ Reset everything
       setCartItems([]);
       setAmountPaid(0);
       setAmountEdited(false);
 
-      
     } catch (err) {
       console.error(err);
+
       const detail = err?.response?.data?.detail;
-      if (Array.isArray(detail)) alert(detail.map(d => d.msg).join("\n"));
-      else alert(detail || "Transaction failed");
+
+      if (Array.isArray(detail)) {
+        alert(detail.map((d) => d.msg).join("\n"));
+      } else {
+        alert(detail || "Transaction failed");
+      }
+
+    } finally {
+      // ✅ Always re-enable the button
+      setIsSubmitting(false);
     }
   };
 
@@ -841,11 +866,15 @@ const handleLoadInvoice = async (invoiceNo) => {
 
                 <button
                   className="complete-btn1"
-                  disabled={cartItems.length === 0 || reprintMode}
+                  disabled={
+                      cartItems.length === 0 ||
+                      reprintMode ||
+                      isSubmitting
+                  }
                   onClick={handleSubmit}
-                >
-                  🖨️ Print Receipt
-                </button>
+              >
+                  {isSubmitting ? "Saving Sale..." : "🖨️ Print Receipt"}
+              </button>
               </div>
 
             </div>
